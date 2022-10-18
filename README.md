@@ -81,7 +81,7 @@ The sam files are split into files for each cell. This is when things get a litt
 
 Then the genes are counted. 
 
-That's the end of the main script and then the final step is to do the gene count processing.\
+That's the end of the main script and then the final step is to do the gene count processing. (This is CX's version)\
     ***gene_count_processing_sciRNAseq_CX.R***\
         In this script, for each experiment, change the report folder (should be <your experiment folder>/nobackup/output/report) and output folder (this can be the same folder)\
         load R/4.0.0 and then run the genecount processing script with: `Rscript gene_count_processing_sciRNAseq_CX.R` 
@@ -89,7 +89,7 @@ That's the end of the main script and then the final step is to do the gene coun
 
 ### Extras
 
-***estimate_dup_rate.sh***\
+***estimate_dup_rate.sh*** (from CX)\
     This will compare the sizes of the sam files before and after filtering to help estimate your duplication rate. Run the script from your experiment 
     directory, then open up the resulting file in R with these lines to get your dup rate:\
     dat = read.table("read_num.txt", as.is=T)\
