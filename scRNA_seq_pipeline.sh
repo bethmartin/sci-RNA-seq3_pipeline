@@ -79,8 +79,8 @@ module load R/4.0.0
 
 
 ########### UMI attach
-this script take in a input folder, a sample ID, a output folder, a oligo-dT barcode file, a corresponding N5 barcode file, and
-it pass the factors to the python script
+##this script take in a input folder, a sample ID, a output folder, a oligo-dT barcode file, a corresponding N5 barcode file, and
+##it pass the factors to the python script
 input_folder=$fastq_folder
 output_folder=$all_output_folder/UMI_attach
 #script=$script_path/UMI_barcode_attach_gzipped_with_dic_new_2RT.py  #this is new for 2 RT primers still needs tweaking I think
