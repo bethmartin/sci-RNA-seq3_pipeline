@@ -30,7 +30,7 @@ Make sure you have requested enough memory/cores to hold the genome.
 script is ***demultiplex.sh***\
 In this script you will need to change the path to the run folder, samplesheet and the output folder. \
 You will also change the --use-bases-mask argument depending on whether its a single- or double-indexed run\
-A couple of samplesheet templates that include the 4 plates of PCR P7 indexes. (add your p5 index to the dual index version).\
+A couple of samplesheet templates that include the 4 plates of PCR P7 indexes. (add your p5 index to the dual index version):\
 ***demux-samplesheet-singleindex.csv***\
 ***demux-samplesheet-dualindex.csv***
 
@@ -98,16 +98,16 @@ That's the end of the main script and then the final step is to do the gene coun
 
 ***generate_RT_lig_pickle.py***
     you will only have to generate new pickle files if you add new custom indexes to the ones already used. \
-    MAKING PICKLE DICTIONARY\
+    MAKING PICKLE DICTIONARY EXAMPLE\
     script:\
     ***generate_RT_lig_pickle.py***\
     input files:\
-    ***RT_gestalt_bc.txt***\
-    ***ligation_gestalt_bc.txt***\
+    ***RT_bc.txt***\
+    ***ligation_bc.txt***\
     output # change these paths in the script as needed\
-    path_to_your_script_directory/lig_gestalt_bc.pickle\
-    path_to_your_script_directory/lig_gestalt_bc.pickle2\
-    path_to_your_script_directory/RT_gestalt_bc.pickle\
-    path_to_your_script_directory/RT_gestalt_bc.pickle2\
+    path_to_your_script_directory/lig_bc.pickle\
+    path_to_your_script_directory/lig__bc.pickle2\
+    path_to_your_script_directory/RT_bc.pickle\
+    path_to_your_script_directory/RT_bc.pickle2\
     to run:\
     <path to python 2.7>/anaconda2/bin/python <path to this script>/generate_RT_lig_pickle.py    
