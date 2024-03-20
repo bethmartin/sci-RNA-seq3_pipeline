@@ -16,7 +16,7 @@ module load numpy/1.26.4\
 module load matplotlib/3.8.3\
 module load pandas/2.1.4\
 module load levenshtein/0.25.0\
-module load HTSeq/2.0.5\
+module load HTSeq/2.0.5
 
 Several files will need editing to find your folders where your data and scripts are kept, when you are downloading these scripts for the first time.
 
