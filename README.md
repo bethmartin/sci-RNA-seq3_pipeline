@@ -3,17 +3,20 @@
 originally written by Junyue Cao, tweaked by Beth
 
 Modules used throughout pipeline:\
-module load modules modules-init modules-gs\
-module load gmp/6.1.2\
-module load mpfr/4.0.1\
-module load mpc/1.1.0\
-module load gcc/8.2.0\
-module load bcl2fastq/2.20\
-module load STAR/2.6.1d\
-module load samtools/1.9\
-module load bedtools/2.27.1\
-module load R/4.0.0\
-python 2.7 installed somewhere
+module load modules modules-init modules-gs
+module load samtools/1.19  
+module load bedtools/2.31.1  
+module load STAR/2.6.1d  
+module load R/4.3.2  
+module load python/3.12.1 
+module load cutadapt/4.6  
+module load fastqc/0.12.1  
+module load trim_galore/0.6.10
+module load numpy/1.26.4
+module load matplotlib/3.8.3
+module load pandas/2.1.4
+module load levenshtein/0.25.0
+module load HTSeq/2.0.5
 
 Several files will need editing to find your folders where your data and scripts are kept, when you are downloading these scripts for the first time.
 
@@ -39,7 +42,7 @@ If you've just downloaded the files, here are the changes you need to make:
 
 ***scRNA_seq_pipeline.sh*** \
     Change the "script_path" at the top to the folder where you've put all the scripts\
-    Change the "python_path" in the common settings to where you have python v2.7\
+    Change the "python_path" in the common settings to where you have python, if you want to use a specific python environment. It's written now to use python on the cluster.
     For *each* experiment, you will have to change the experiment-specific settings\
         fastq_folder = where you put the fastq files after demuxing\
         all_output_folder = where all the output is going\
@@ -51,13 +54,13 @@ If you've just downloaded the files, here are the changes you need to make:
         
 
 ***sci3_rmdup.sh***\
-    Change the folders for "python" and "python_script"
+    Change the folders for (opt.)"python" and "python_script"
 
 ***sci3_rmdup_nomismatch.sh***\
-    Change the folders for "python" and "python_script"
+    Change the folders for (opt.)"python" and "python_script"
     
 ***sci3_split.sh***\
-    Change the folders for "python" and "python_script"
+    Change the folders for (opt.)"python" and "python_script"
 
 
 ### What's happening in the script
@@ -84,7 +87,7 @@ Then the genes are counted.
 That's the end of the main script and then the final step is to do the gene count processing. (This is CX's version)\
     ***gene_count_processing_sciRNAseq_CX.R***\
         In this script, for each experiment, change the report folder (should be <your experiment folder>/nobackup/output/report) and output folder (this can be the same folder)\
-        load R/4.0.0 and then run the genecount processing script with: `Rscript gene_count_processing_sciRNAseq_CX.R` 
+        load R/4.3.2 and then run the genecount processing script with: `Rscript gene_count_processing_sciRNAseq_CX.R` 
 
 
 ### Extras
