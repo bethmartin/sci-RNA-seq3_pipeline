@@ -3,20 +3,20 @@
 originally written by Junyue Cao, tweaked by Beth
 
 Modules used throughout pipeline:\
-module load modules modules-init modules-gs
-module load samtools/1.19  
-module load bedtools/2.31.1  
-module load STAR/2.6.1d  
-module load R/4.3.2  
-module load python/3.12.1 
-module load cutadapt/4.6  
-module load fastqc/0.12.1  
-module load trim_galore/0.6.10
-module load numpy/1.26.4
-module load matplotlib/3.8.3
-module load pandas/2.1.4
-module load levenshtein/0.25.0
-module load HTSeq/2.0.5
+module load modules modules-init modules-gs\
+module load samtools/1.19  \
+module load bedtools/2.31.1  \
+module load STAR/2.6.1d  \
+module load R/4.3.2  \
+module load python/3.12.1 \
+module load cutadapt/4.6  \
+module load fastqc/0.12.1  \
+module load trim_galore/0.6.10\
+module load numpy/1.26.4\
+module load matplotlib/3.8.3\
+module load pandas/2.1.4\
+module load levenshtein/0.25.0\
+module load HTSeq/2.0.5\
 
 Several files will need editing to find your folders where your data and scripts are kept, when you are downloading these scripts for the first time.
 
