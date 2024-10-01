@@ -7,16 +7,23 @@ import csv
 from multiprocessing import Pool
 from functools import partial
 
+#need to put these somewhere
+#filter_output = output_folder + "/filter_rate.txt"
+#open(filter_output, 'at') as f4
+
 def UMI_attach_read2_barcode_list(pcrwell, input_folder, output_folder, ligation_barcode_list, RT_barcode_list, RTsamplename_dict, RTwells_dict, LIGwells_dict, mismatch_rate=1):
     Read1 = input_folder + "/" + pcrwell + ".R1.fastq.gz"
     Read2 = input_folder + "/" + pcrwell + ".R2.fastq.gz"
     output_file = output_folder + "/" + pcrwell + ".R2.fastq.gz"
     mismatch_rate = int(mismatch_rate)
+    filter_output = output_folder + "/../filter_rate.txt"
+    f4 = open(filter_output, 'at')
 
     with gzip.open(Read1, 'rt') as f1, gzip.open(Read2, 'rt') as f2, gzip.open(output_file, 'wt') as f3:
         line1 = f1.readline()
         line2 = f2.readline()
         total_line = 0
+        ligation_line = 0
         filtered_line = 0
 
         while line1:
@@ -30,6 +37,7 @@ def UMI_attach_read2_barcode_list(pcrwell, input_folder, output_folder, ligation
                 if ligation_bc_match in LIGwells_dict:
                     ligindx = LIGwells_dict[ligation_bc_match]
                     target_RT = line1[len(ligation_bc_match) + 14: len(ligation_bc_match) + 24] #these stay the same
+                    ligation_line += 1 
 
                     if target_RT in RT_barcode_list:
                         barcode = RT_barcode_list[target_RT]
@@ -77,8 +85,8 @@ def UMI_attach_read2_barcode_list(pcrwell, input_folder, output_folder, ligation
             line1 = f1.readline()
             line1 = f1.readline()
 
-    print(f"PCR well: {pcrwell}, total line: {total_line}, filtered line: {filtered_line}, filter rate: {float(filtered_line) / float(total_line)}")
-
+    print(f"PCR well: {pcrwell}, total line: {total_line}, ligation filtered line: {ligation_line}, total filtered line: {filtered_line}, ligation filter rate: {float(ligation_line) / float(total_line)}, total filter rate: {float(filtered_line) / float(total_line)}")
+    f4.write(f"PCR well: {pcrwell}, total line: {total_line}, ligation filtered line: {ligation_line}, total filtered line: {filtered_line}, ligation filter rate: {float(ligation_line) / float(total_line)}, total filter rate: {float(filtered_line) / float(total_line)}\n")
 
 def attach_UMI_files(input_folder, pcrwell, output_folder, ligation_barcode_file, LIGlist, RT_barcode_file, RT_sample, core):
     init_message = f'''
@@ -128,6 +136,10 @@ def attach_UMI_files(input_folder, pcrwell, output_folder, ligation_barcode_file
     with open(LIGlist, "r") as LIGwells:
         RTreader4 = csv.DictReader(LIGwells)
         LIGwells_dict = {rows["LIGindex"]: rows["LIGwell"] for rows in RTreader4}
+        print(LIGwells_dict)
+
+
+
 
     pcrwell_file = open(pcrwell)
     pcrwell_list = []
