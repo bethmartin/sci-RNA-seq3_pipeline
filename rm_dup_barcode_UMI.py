@@ -33,7 +33,7 @@ def rm_dup_samfile(samfile, output_file, mismatch):
                 f2.write(line)
             else:
                 name = (((line.split('\t'))[0]).split(','))
-                barcode_UMI = name[0] + name[1]
+                barcode_UMI = name[0] + name[1] + name[2] 
                 chrom_num = (line.split('\t'))[2]
                 start_site = (line.split('\t'))[3]
 
