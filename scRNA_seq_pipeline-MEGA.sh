@@ -24,13 +24,14 @@ RT_sample="<your_project_folder>/RTsamplesheet.csv"
 # define the location for the index files used in STAR - remember what organism youre doing here
 # drosophila: /net/shendure/vol12/projects/sciRNAseq_script/index/STAR_drosophila_BDGP6/
 # mouse: /net/shendure/vol10/projects/scRNA/nobackup/reference/index/STAR/STAR_mm10_RNAseq/ #deleted
-# newer mouse: /net/shendure/vol10/nobackup/genome/STAR/GRCm38-p6-all
-index="/net/shendure/vol10/nobackup/genome/STAR/GRCm38-p6-all"
+# newer mouse: /net/shendure/vol10/nobackup/genome/STAR/GRCm39-p6-all
+index="/net/shendure/vol10/nobackup/genome/STAR/GRCm39-p6-all"
 # define the gtf file for gene counting
 # drosophila: /net/shendure/vol12/projects/sciRNAseq_script/gtf_file/Drosophila_melanogaster.BDGP6.87.gtf.gz
 # mouse: /net/shendure/vol1/home/martin91/nobackup/reference/mouse/gencode.vM22.chr_patch_hapl_scaff.annotation.gtf.gz
 # newer mouse: /net/shendure/vol10/nobackup/genome/GTF/gencode.vM25.chr_patch_hapl_scaff.annotation.gtf.gz
-gtf_file="/net/shendure/vol10/nobackup/genome/GTF/gencode.vM25.chr_patch_hapl_scaff.annotation.gtf.gz"
+# newest mouse: /net/shendure/vol10/nobackup/genome/GTF/gencode.vM37.chr_patch_hapl_scaff.annotation.gtf.gz
+gtf_file="/net/shendure/vol10/nobackup/genome/GTF/gencode.vM37.chr_patch_hapl_scaff.annotation.gtf.gz"
 
 # the following script will be different for different organisms, because of the structure of the gtf file, the fly one is weird
 # for mouse/human: countscript=$script_path/sciRNAseq_count.py
@@ -94,8 +95,6 @@ module load HTSeq/2.0.5
 ##it pass the factors to the python script
 input_folder=$fastq_folder
 output_folder=$all_output_folder/UMI_attach
-#script=$script_path/UMI_barcode_attach_gzipped_with_dic_new_2RT.py  #this is new for 2 RT primers 
-#script=$script_path/UMI_barcode_attach_gzipped_with_dic_new.py # this is new for just 1 RT Primer  
 script=$script_path/UMI_barcode_attach_gzipped_with_dic_MEGA.py #this is for new MEGA primers 
 
 now=$(date)
@@ -128,8 +127,6 @@ Rscript $R_script $script_path/sci3_trim.sh $UMI_attached_R2 $pcrwell $trimmed_f
 trimmed_fastq=$all_output_folder/trimmed_fastq
 input_folder=$trimmed_fastq
 STAR_output_folder=$all_output_folder/STAR_alignment
-filtered_sam_folder=$all_output_folder/filtered_sam
-rmdup_sam_folder=$all_output_folder/rmdup_sam
 
 
 #align read2 to the index file using STAR with default setting # you will need to make sure your session has enough memory (40G): qlogin -l mfree=4G -pe serial 10
@@ -143,34 +140,36 @@ mkdir -p $STAR_output_folder
 #remove the index from the memory #is this here just in case you have a previous index in memory? or is this a typo that it's here?
 STAR --genomeDir $index --genomeLoad Remove
 #start the alignment
-for sample in $(cat $pcrwell); do echo Aligning $sample;STAR --runThreadN $core --outSAMstrandField intronMotif --genomeDir $index --readFilesCommand zcat --readFilesIn $input_folder/$sample*gz --outFileNamePrefix $STAR_output_folder/$sample --genomeLoad LoadAndKeep --outReadsUnmapped Fastx; done
+for sample in $(cat $pcrwell); do echo Aligning $sample;STAR --runThreadN $core --genomeDir $index --readFilesCommand zcat --readFilesIn $input_folder/$sample*gz --outFileNamePrefix $STAR_output_folder/$sample --genomeLoad LoadAndKeep --outReadsUnmapped Fastx; done
 #remove the index from the memory
 STAR --genomeDir $index --genomeLoad Remove
 echo "All alignment done."
 
+
 #make the filter sam folder, and filter and sort the sam file 
 #make the flltered sam folder
+filtered_sam_folder=$all_output_folder/filtered_sam
 echo
 echo "Start filter and sort the sam files..."
 echo input folder: $STAR_output_folder
 echo output folder: $filtered_sam_folder
 
-
 bash_script=$script_path/sci3_filter.sh 
-Rscript $R_script $bash_script $STAR_output_folder $pcrwell $filtered_sam_folder $core_sam
+Rscript $R_script $bash_script $STAR_output_folder $pcrwell $filtered_sam_folder $core
+
 
 # make a folder for rmdup_sam_folder, 
 # Then for each filtered sam file, remove the duplicates based on UMI and barcode, chromatin number and position
+rmdup_sam_folder=$all_output_folder/rmdup_sam
 echo
 echo "Start removing duplicates..."
 echo input folder: $filtered_sam_folder
 echo output folder: $rmdup_sam_folder
 mkdir -p $rmdup_sam_folder
 
-
 bash_script=$script_path/sci3_rmdup_nomismatch.sh # for removing duplicates only considering exact match
-
 Rscript $R_script $bash_script $filtered_sam_folder $pcrwell $rmdup_sam_folder $core $mismatch
+
 
 #mv the reported files to the report/duplicate_read/ folder
 mkdir -p $input_folder/../report/duplicate_read
@@ -179,49 +178,43 @@ echo "removing duplicates completed.."
 echo
 echo "Alignment and sam file preprocessing are done."  
 
-# repeat the rmdup process to remove duplicates based on UMI distance
-echo
-echo "Start removing duplicates..."
-echo input folder: $all_output_folder/rmdup_sam
-echo output folder: $all_output_folder/rmdup_sam_2
-mkdir -p $all_output_folder/rmdup_sam_2
 
-
-
-bash_script=$script_path/sci3_rmdup.sh
-filtered_sam_folder=$all_output_folder/rmdup_sam
-rmdup_sam_folder=$all_output_folder/rmdup_sam_2
-Rscript $R_script $bash_script $filtered_sam_folder $pcrwell $rmdup_sam_folder $core $mismatch
+### calculate read number and estimate duplicate rate
+for i in `ls $filtered_sam_folder/*.sam`; do 
+    samtools view -c $i >> $all_output_folder/tmp1
+done
+for i in `ls $rmdup_sam_folder/*.sam`; do 
+    samtools view -c $i >> $all_output_folder/tmp2
+done
+paste $all_output_folder/tmp1 $all_output_folder/tmp2 > $all_output_folder/read_num.txt
+rm $all_output_folder/tmp1 $all_output_folder/tmp2
 
 
 ################# split the sam file based on the barcode, and mv the result to the report folder
-sam_folder=$all_output_folder/rmdup_sam_2
-output_folder=$all_output_folder/sam_splitted
+sam_folder=$all_output_folder/rmdup_sam
+sam_splitted_folder=$all_output_folder/sam_splitted
 
 
 echo
 echo "Start splitting the sam file..."
 echo samfile folder: $sam_folder
 echo pcrwell list: $pcrwell
-echo output folder: $output_folder
+echo output folder: $sam_splitted_folder
 echo barcode file: $barcodes
 echo cutoff value: $cutoff
 
 
-
-
-
 bash_script=$script_path/sci3_split.sh
-Rscript $R_script $bash_script $sam_folder $pcrwell $output_folder $core $barcodes $cutoff
+Rscript $R_script $bash_script $sam_folder $pcrwell $sam_splitted_folder $splitcore $barcodes $cutoff
 
 #this is making a list of all the barcodes in the data
-cat $output_folder/*sample_list.txt>$output_folder/All_samples.txt
-cp $output_folder/All_samples.txt $output_folder/../barcode_samples.txt
+cat $sam_splitted_folder/*sample_list.txt>$sam_splitted_folder/All_samples.txt
+cp $sam_splitted_folder/All_samples.txt $sam_splitted_folder/../barcode_samples.txt
 
 # output the report the report/barcode_read_distribution folder
-mkdir -p $output_folder/../report/barcode_read_distribution
-mv $output_folder/*.txt $output_folder/../report/barcode_read_distribution/
-mv $output_folder/*.png $output_folder/../report/barcode_read_distribution/
+mkdir -p $sam_splitted_folder/../report/barcode_read_distribution
+mv $sam_splitted_folder/*.txt $sam_splitted_folder/../report/barcode_read_distribution/
+mv $sam_splitted_folder/*.png sam_splitted_folder/../report/barcode_read_distribution/
 echo
 echo "All sam file splitted."
 
@@ -242,6 +235,19 @@ find $input_folder -name *.report -exec cat {} + > $output_folder/report.MM
 find $input_folder -name '*.report' | xargs rm -f
 mv $input_folder/*_annotate.txt $output_folder/
 echo "All output files are transferred~"
+
+##################################
+### Step 8: create data matrix ###
+##################################
+
+echo "Start creating data matrix...."
+Rscript $script_path/gene_count_processing_sciRNAseq_generic.R \
+    $all_output_folder/report/
+
+echo ">>>Step 8 (creating data matrix) has been done."
+
+
+
 now=$(date)
 echo "Current time : $now"
-echo "load R/4.3.2 and then run the genecount processing script with Rscript gene_count_processing_sciRNAseq_CX.R"
+
