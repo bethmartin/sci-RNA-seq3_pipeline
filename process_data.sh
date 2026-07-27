@@ -30,17 +30,17 @@ core_sam=3
 cutoff=100
 
 # mouse genome
-index="/net/shendure/vol10/nobackup/genome/STAR/GRCm39-p6-all-PEmax"
-gtf_file="/net/shendure/vol10/nobackup/genome/GTF/gencode.vM37.chr_patch_hapl_scaff.annotation_add_PEmax.gtf.gz"
+index="<path to STAR reference here>"
+gtf_file="<path to gzipped gtf file here>"
 
 #define the mismatch rate for removing duplicates:
 mismatch=1
 
 #define the bin of python (python V2.7)
-python_path="/net/shendure/vol12/projects/sciRNAseq_script/anaconda2/bin/"
+python_path="<path to python here>"
 
 #define the bin of R (R V3.6.3)
-R_path="/net/gs/vol3/software/modules-sw/R/4.3.2/Linux/Ubuntu22.04/x86_64/bin"
+R_path="<path to R here>"
 
 #define the location of script:
 script_path="/net/gs/vol1/home/cxqiu/work/scripts/JAX_rna/Jun_pipeline"
