@@ -1,3 +1,4 @@
+#use process_data.sh instead of this, its a bit more streamlined
 #original scripts from Jun, tweaked by Beth
 #updated for ubuntu and python3 3/12/2024 by Beth
 
