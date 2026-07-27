@@ -42,9 +42,9 @@ A couple of samplesheet templates that include the 4 plates of PCR P7 indexes. (
 ### Next is running the main sci-RNA-seq3 pipeline. Main script is scRNA_seq_pipeline.sh
 If you've just downloaded the files, here are the changes you need to make:
 
-***scRNA_seq_pipeline.sh*** \
+***process_data.sh*** \
     Change the "script_path" at the top to the folder where you've put all the scripts\
-    Change the "python_path" in the common settings to where you have python, if you want to use a specific python environment. It's written now to use python on the cluster.
+    Change the "python_path" and "R path" in the common settings to where you have python, if you want to use a specific python environment. It's written now to use python on the cluster.
     For *each* experiment, you will have to change the experiment-specific settings\
         fastq_folder = where you put the fastq files after demuxing\
         all_output_folder = where all the output is going\
@@ -52,7 +52,7 @@ If you've just downloaded the files, here are the changes you need to make:
         RT_sample = a samplesheet with the headers: RTwell, RTindex, SampleName. Defines which samples went into each well of the RT plate(s).\
         index = the STAR reference folder\
         gtf_file = the .gtf file that goes with that reference (is gzipped)\
-        countscript = sciRNAseq_count.py should work for most references
+
         
 
 ***sci3_rmdup.sh***\
